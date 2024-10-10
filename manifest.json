@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Whatsapp Group Number Extractor",
+  "version": "1.0",
+  "description": "Extracts phone numbers from web.whatsapp.com and saves them as CSV",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": ["*://web.whatsapp.com/*"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://web.whatsapp.com/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
