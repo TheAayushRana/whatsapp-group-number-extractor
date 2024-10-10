@@ -1,7 +1,7 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'extractNumbers') {
-    const { numbers } = extractPhoneNumbers();
-    sendResponse({ numbers });
+    const { numbers, groupName } = extractPhoneNumbers();
+    sendResponse({ numbers, groupName });
   }
   return true;
 });
@@ -12,7 +12,7 @@ const extractPhoneNumbers = () => {
   };
 
   if (!targetDiv) {
-    return { numbers: [] };
+    return { numbers: [], groupName: '' };
   }
 
   const { spanElement } = {
@@ -20,12 +20,19 @@ const extractPhoneNumbers = () => {
   };
 
   if (!spanElement) {
-    return { numbers: [] };
+    return { numbers: [], groupName: '' };
   }
 
   const { content } = {
     content: spanElement.textContent
   };
+
+  // Extract group name from the correct location
+  const { groupNameElement } = {
+    groupNameElement: document.querySelector('header._amid span.x1iyjqo2.x6ikm8r.x10wlt62.x1n2onr6.xlyipyv.xuxw1ft.x1rg5ohu._ao3e')
+  };
+
+  const groupName = groupNameElement ? groupNameElement.textContent.trim() : 'Unknown Group';
 
   // Updated regex to match various phone number formats
   const phoneRegex = /\+\d{1,4}\s?(\(\d{1,4}\))?\s?\d{1,4}[-\s]?\d{1,4}[-\s]?\d{1,9}/g;
@@ -43,5 +50,11 @@ const extractPhoneNumbers = () => {
     return countryCodeA.localeCompare(countryCodeB);
   });
 
-  return { numbers: sortedNumbers };
+  // Add group name to each number
+  const numbersWithGroupName = sortedNumbers.map(number => `${groupName},${number}`);
+
+  // Add header row
+  numbersWithGroupName.unshift('Group Name,Phone Number');
+
+  return { numbers: numbersWithGroupName, groupName };
 };
